@@ -1,6 +1,6 @@
 # Reflex Trading Analytics Dashboard
 
-以 Reflex 建置的股票技術分析儀表板。輸入股票代碼與日期區間後，可查看 SMA、EMA、RSI、MACD、布林通道與 ATR 等指標及互動圖表。
+以 Reflex 建置的股票技術分析儀表板。輸入美股代碼與日期區間後，可查看 SMA、EMA、RSI、MACD、布林通道、ATR、黃金交叉、死亡交叉等指標及互動圖表。
 
 ## 本機執行 (Docker)
 
