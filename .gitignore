@@ -1,0 +1,9 @@
+.worktrees/
+.venv/
+.web/
+.states/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env
+.env.*.worktrees/
