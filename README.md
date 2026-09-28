@@ -16,6 +16,8 @@ Reflex Cloud 入口：[https://build.reflex.dev/](https://build.reflex.dev/)。�
 在本專案根目錄登入並執行部署：
 
 ```powershell
+cd D:\pythonworkspace\custom-trading-analytics-metrics-with-reflex-app
+.\.venv\Scripts\Activate.ps1
 reflex login
 reflex deploy --project <PROJECT_ID>
 ```
