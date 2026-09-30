@@ -27,6 +27,7 @@ def _sample_df(n: int = 220) -> pd.DataFrame:
     df["signal"] = macd_df["signal"]
     df = indicators.bollinger_bands(df)
     df = indicators.atr(df)
+    df["Volume_SMA_20"] = indicators.volume_sma(df)
     return df.dropna()
 
 
@@ -95,6 +96,6 @@ def test_build_dashboard_figure_has_twenty_traces_and_five_rows():
     fig = charts.build_dashboard_figure(df, "TEST")
 
     assert isinstance(fig, go.Figure)
-    assert len(fig.data) == 20
+    assert len(fig.data) == 21
     yaxes = [key for key in fig.layout if key.startswith("yaxis")]
     assert len(yaxes) == 5

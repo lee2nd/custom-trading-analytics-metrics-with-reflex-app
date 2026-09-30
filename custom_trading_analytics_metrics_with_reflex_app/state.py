@@ -12,7 +12,7 @@ from . import charts, indicators
 
 logger = logging.getLogger(__name__)
 
-PERIOD_OPTIONS = ["1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "max"]
+PERIOD_OPTIONS = ["6mo", "1y", "2y", "5y", "10y", "max"]
 
 
 class EmptyDataError(Exception):
@@ -29,6 +29,7 @@ def analyze_ticker(df, ticker: str) -> dict[str, go.Figure]:
     df["signal"] = macd_df["signal"]
     df = indicators.bollinger_bands(df)
     df = indicators.atr(df)
+    df["Volume_SMA_20"] = indicators.volume_sma(df)
     df = df.dropna()
     if df.empty:
         raise EmptyDataError(
@@ -63,6 +64,10 @@ class AppState(rx.State):
     is_loading: bool = False
     error: str = ""
 
+    # Left sidebar navigation: active_section is "summary" or "analysis".
+    active_section: str = "analysis"
+    active_page: str = "dashboard"
+
     price_volume_figure: go.Figure = _empty_figure()
     trend_figure: go.Figure = _empty_figure()
     rsi_macd_figure: go.Figure = _empty_figure()
@@ -77,6 +82,11 @@ class AppState(rx.State):
     @rx.event
     def set_period(self, value: str):
         self.period = value
+
+    @rx.event
+    def set_active_page(self, section: str, page: str):
+        self.active_section = section
+        self.active_page = page
 
     @rx.event
     def submit(self):

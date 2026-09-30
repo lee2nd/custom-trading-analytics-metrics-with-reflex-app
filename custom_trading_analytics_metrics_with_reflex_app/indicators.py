@@ -82,6 +82,11 @@ def atr(df: pd.DataFrame, n: int = 14) -> pd.DataFrame:
     return df
 
 
+def volume_sma(df: pd.DataFrame, n: int = 20) -> pd.Series:
+    """n-period simple moving average of Volume, used as a baseline to judge 量增/量縮."""
+    return df["Volume"].rolling(window=n).mean()
+
+
 def buy_sell_probability(df: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
     """Return (buy_prob, sell_prob) percentage Series from a 6-vote composite score."""
     s1 = (df["Close"] > df["SMA_50"]).astype(int) * 2 - 1
