@@ -2,11 +2,13 @@ import reflex as rx
 
 from ..state import AppState
 from .controls import controls
+from .llm_rankings import llm_rankings
 
 SUMMARY_ITEMS = [
     ("news", "新聞", "newspaper"),
     ("reliable_indicators", "可靠指標", "shield-check"),
     ("news_sites", "消息網站", "globe"),
+    ("llm_rankings", "LLM 模型排名", "trophy"),
 ]
 
 ANALYSIS_ITEMS = [
@@ -154,6 +156,7 @@ def _main_content() -> rx.Component:
             ("news", _summary_placeholder("新聞")),
             ("reliable_indicators", _summary_placeholder("可靠指標")),
             ("news_sites", _summary_placeholder("消息網站")),
+            ("llm_rankings", llm_rankings()),
             _analysis_content(),
         ),
         width="100%",
