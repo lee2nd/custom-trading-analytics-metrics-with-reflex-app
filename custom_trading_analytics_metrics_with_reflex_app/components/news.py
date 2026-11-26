@@ -107,12 +107,6 @@ NEWS_SOURCES = [
     },
     {
         "category": "加密貨幣",
-        "name": "Cointelegraph",
-        "url": "https://cointelegraph.com/",
-        "strength": "幣圈最具影響力的綜合媒體之一，與 CoinDesk 並列重大新聞的第一手來源",
-    },
-    {
-        "category": "加密貨幣",
         "name": "動區動趨 (BlockTempo)",
         "url": "https://www.blocktempo.com/",
         "strength": "台灣最活躍的區塊鏈媒體之一，編譯海外一手快訊的速度極快，並會補充台灣在地法規與交易所動態",
@@ -122,18 +116,6 @@ NEWS_SOURCES = [
         "name": "鏈新聞 (ABMedia)",
         "url": "https://abmedia.io/",
         "strength": "台灣最活躍的區塊鏈媒體之一，提供全球區塊鏈與加密貨幣的一手新聞與趨勢報告",
-    },
-    {
-        "category": "加密貨幣",
-        "name": "PANews",
-        "url": "https://www.panewslab.com/zh-hant",
-        "strength": "提供類似彭博終端機的「24 小時滾動快訊流」，適合盯盤時快速瀏覽鏈上大額轉帳與項目公告",
-    },
-    {
-        "category": "加密貨幣",
-        "name": "Foresight News",
-        "url": "https://www.foresightnews.pro/",
-        "strength": "聚焦 Web3 產業趨勢的快訊平台，提供即時新聞與深度解析",
     },
 ]
 
