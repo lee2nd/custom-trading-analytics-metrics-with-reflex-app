@@ -3,6 +3,7 @@ import reflex as rx
 from ..state import AppState
 from .controls import controls
 from .llm_rankings import llm_rankings
+from .news import news
 
 SUMMARY_ITEMS = [
     ("news", "新聞", "newspaper"),
@@ -153,7 +154,7 @@ def _main_content() -> rx.Component:
     return rx.box(
         rx.match(
             AppState.active_page,
-            ("news", _summary_placeholder("新聞")),
+            ("news", news()),
             ("reliable_indicators", _summary_placeholder("可靠指標")),
             ("news_sites", _summary_placeholder("消息網站")),
             ("llm_rankings", llm_rankings()),
