@@ -36,14 +36,14 @@ NEWS_SOURCES = [
     {
         "category": "跨市場與總經",
         "name": "Bloomberg（彭博）",
-        "url": "https://www.bloomberg.com/",
+        "url": "https://money.udn.com/money/vipbloomberg/time?from=edn_navibar&dark_mode=1",
         "strength": "全球機構法人的一手消息來源，涉及美國利率政策、大型科技股財報、國際貿易關稅或重大監管時幾乎是所有媒體轉載的源頭（有免費閱讀額度，重度需求建議訂閱）",
     },
     {
         "category": "跨市場與總經",
-        "name": "Reuters（路透社）",
-        "url": "https://www.reuters.com/",
-        "strength": "全球機構法人的一手消息來源，與 Bloomberg 並列重大政策、財報與監管新聞的轉載源頭",
+        "name": "Buzzing 彭博社最新報道",
+        "url": "https://www.buzzing.cc/zh-Hant/",
+        "strength": "將 Bloomberg 網站最新新聞進行標題與要點自動中文翻譯，網頁介面極簡、更新速度快，非常適合用來快速過濾與掌握有哪些最新重要消息",
     },
     {
         "category": "跨市場與總經",
