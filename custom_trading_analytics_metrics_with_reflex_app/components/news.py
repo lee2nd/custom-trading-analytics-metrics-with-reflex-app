@@ -1,5 +1,19 @@
+import itertools
+
 import reflex as rx
 
+# Radix color token used for each category's accent bar, heading, and card
+# hover border.
+CATEGORY_COLORS = {
+    "綜合看盤": "green",
+    "跨市場與總經": "purple",
+    "台股": "blue",
+    "美股": "amber",
+    "加密貨幣": "crimson",
+}
+
+# Ordered by category so itertools.groupby in news() produces one group per
+# category without needing to sort first.
 NEWS_SOURCES = [
     {
         "category": "綜合看盤",
@@ -21,124 +35,169 @@ NEWS_SOURCES = [
     },
     {
         "category": "跨市場與總經",
-        "name": "Bloomberg（彭博） / Reuters（路透社）",
-        "strength": "全球機構法人的一手消息來源。涉及美國利率政策、大型科技股財報、國際貿易關稅或重大監管時，這兩家幾乎是所有媒體轉載的源頭（Bloomberg 有免費閱讀額度，重度需求建議訂閱）。",
+        "name": "Bloomberg（彭博）",
+        "url": "https://www.bloomberg.com/",
+        "strength": "全球機構法人的一手消息來源，涉及美國利率政策、大型科技股財報、國際貿易關稅或重大監管時幾乎是所有媒體轉載的源頭（有免費閱讀額度，重度需求建議訂閱）",
+    },
+    {
+        "category": "跨市場與總經",
+        "name": "Reuters（路透社）",
+        "url": "https://www.reuters.com/",
+        "strength": "全球機構法人的一手消息來源，與 Bloomberg 並列重大政策、財報與監管新聞的轉載源頭",
     },
     {
         "category": "跨市場與總經",
         "name": "財經M平方 (MacroMicro)",
-        "strength": "偏重「數據解讀」而非即時新聞，將台美總經指標、聯準會動向與產業循環圖表化，適合用來過濾日常雜訊、確認中長線趨勢。",
+        "url": "https://www.macromicro.me/",
+        "strength": "偏重「數據解讀」而非即時新聞，將台美總經指標、聯準會動向與產業循環圖表化，適合用來過濾日常雜訊、確認中長線趨勢",
     },
     {
         "category": "台股",
-        "name": "經濟日報 / 工商時報",
-        "strength": "台灣兩大財經專業報，對半導體供應鏈（台積電、AI 伺服器）、法說會重點與本土政策法規的報導最完整。",
+        "name": "經濟日報",
+        "url": "https://money.udn.com/money/index",
+        "strength": "台灣財經專業報，對半導體供應鏈（台積電、AI 伺服器）、法說會重點與本土政策法規的報導最完整",
+    },
+    {
+        "category": "台股",
+        "name": "工商時報",
+        "url": "https://www.ctee.com.tw/",
+        "strength": "台灣兩大財經專業報之一，聚焦工商界要聞與產業財經重要新聞",
     },
     {
         "category": "台股",
         "name": "Yahoo奇摩股市",
-        "strength": "聚合台灣各大財經媒體的即時新聞，搭配個股報價與法人買賣超資訊，適合盤中快速掃描個股異動原因。",
+        "url": "https://tw.stock.yahoo.com/",
+        "strength": "聚合台灣各大財經媒體的即時新聞，搭配個股報價與法人買賣超資訊，適合盤中快速掃描個股異動原因",
     },
     {
         "category": "美股",
         "name": "CNBC",
-        "strength": "美股盤中即時動態、華爾街分析師評級調整與企業 CEO 專訪的第一線平台，電視直播與網頁快訊同步。",
+        "url": "https://www.cnbc.com/",
+        "strength": "美股盤中即時動態、華爾街分析師評級調整與企業 CEO 專訪的第一線平台，電視直播與網頁快訊同步",
     },
     {
         "category": "美股",
         "name": "Benzinga",
-        "strength": "專精於短線交易者最需要的「異動原因（Why Is It Moving）」，盤前盤後某檔股票突然暴漲暴跌時，這裡通常最快給出理由。",
+        "url": "https://www.benzinga.com/",
+        "strength": "專精於短線交易者最需要的「異動原因（Why Is It Moving）」，盤前盤後某檔股票突然暴漲暴跌時這裡通常最快給出理由",
     },
     {
         "category": "美股",
         "name": "Seeking Alpha",
-        "strength": "匯集全球分析師的個股深度研究報告，並提供最完整的美股財報電話會議逐字稿（Earnings Call Transcripts）。",
+        "url": "https://seekingalpha.com/",
+        "strength": "匯集全球分析師的個股深度研究報告，並提供最完整的美股財報電話會議逐字稿（Earnings Call Transcripts）",
     },
     {
         "category": "美股",
         "name": "Finviz",
-        "strength": "雖以選股器聞名，但首頁與每檔個股頁面下方會直接彙整各大外媒（WSJ、MarketWatch、Yahoo Finance 等）的最新新聞連結，掃描效率極高。",
+        "url": "https://finviz.com/",
+        "strength": "雖以選股器聞名，但首頁與每檔個股頁面下方會直接彙整各大外媒（WSJ、MarketWatch、Yahoo Finance 等）的最新新聞連結，掃描效率極高",
     },
     {
         "category": "加密貨幣",
         "name": "The Block",
-        "strength": "機構級研究與深度新聞，對 ETF 資金流向、監管政策與一級市場融資消息最精準。",
+        "url": "https://www.theblock.co/",
+        "strength": "機構級研究與深度新聞，對 ETF 資金流向、監管政策與一級市場融資消息最精準",
     },
     {
         "category": "加密貨幣",
-        "name": "CoinDesk / Cointelegraph",
-        "strength": "幣圈最具影響力的兩大綜合媒體，重大協議升級、駭客事件或市場突發消息都會第一時間發布。",
+        "name": "CoinDesk",
+        "url": "https://www.coindesk.com/",
+        "strength": "幣圈最具影響力的綜合媒體之一，重大協議升級、駭客事件或市場突發消息都會第一時間發布",
     },
     {
         "category": "加密貨幣",
-        "name": "動區動趨 (BlockTempo) / 鏈新聞 (ABMedia)",
-        "strength": "台灣最活躍的兩大區塊鏈媒體，編譯海外一手快訊的速度極快，並會補充台灣在地法規與交易所動態。",
+        "name": "Cointelegraph",
+        "url": "https://cointelegraph.com/",
+        "strength": "幣圈最具影響力的綜合媒體之一，與 CoinDesk 並列重大新聞的第一手來源",
     },
     {
         "category": "加密貨幣",
-        "name": "PANews / Foresight News",
-        "strength": "提供類似彭博終端機的「24 小時滾動快訊流」，適合盯盤時快速瀏覽鏈上大額轉帳與項目公告。",
+        "name": "動區動趨 (BlockTempo)",
+        "url": "https://www.blocktempo.com/",
+        "strength": "台灣最活躍的區塊鏈媒體之一，編譯海外一手快訊的速度極快，並會補充台灣在地法規與交易所動態",
     },
     {
-        "category": "實戰建議",
-        "name": "看盤整合",
-        "strength": "將台股、美股與幣圈的自選標的全部加入 TradingView，直接開啟右側的「新聞（News）」面板，即可在單一視窗接收所有相關外電。",
+        "category": "加密貨幣",
+        "name": "鏈新聞 (ABMedia)",
+        "url": "https://abmedia.io/",
+        "strength": "台灣最活躍的區塊鏈媒體之一，提供全球區塊鏈與加密貨幣的一手新聞與趨勢報告",
     },
     {
-        "category": "實戰建議",
-        "name": "數據預警",
-        "strength": "每天開盤前先看 Investing.com 的財經日曆，確認當晚是否有美國總經數據公布或聯準會官員演說。",
+        "category": "加密貨幣",
+        "name": "PANews",
+        "url": "https://www.panewslab.com/zh-hant",
+        "strength": "提供類似彭博終端機的「24 小時滾動快訊流」，適合盯盤時快速瀏覽鏈上大額轉帳與項目公告",
+    },
+    {
+        "category": "加密貨幣",
+        "name": "Foresight News",
+        "url": "https://www.foresightnews.pro/",
+        "strength": "聚焦 Web3 產業趨勢的快訊平台，提供即時新聞與深度解析",
     },
 ]
 
 
-def _source_name_cell(source: dict) -> rx.Component:
-    if source.get("url"):
-        return rx.link(
+def _source_card(source: dict) -> rx.Component:
+    color = CATEGORY_COLORS[source["category"]]
+    return rx.link(
+        rx.vstack(
             rx.hstack(
                 rx.text(source["name"], size="2", weight="bold"),
-                rx.icon("external-link", size=14, color="var(--accent-11)"),
-                spacing="2",
+                rx.icon("external-link", size=14, color="var(--gray-9)"),
+                justify="between",
                 align="center",
+                width="100%",
             ),
-            href=source["url"],
-            is_external=True,
-            underline="none",
-        )
-    return rx.text(source["name"], size="2", weight="bold")
+            rx.text(source["strength"], size="2", color="gray"),
+            spacing="1",
+            align_items="start",
+            width="100%",
+        ),
+        href=source["url"],
+        is_external=True,
+        underline="none",
+        width="100%",
+        padding="0.75em 1em",
+        border_radius="10px",
+        border="1px solid var(--gray-a5)",
+        background="var(--gray-a2)",
+        _hover={"border_color": f"var(--{color}-8)", "background": "var(--gray-a3)"},
+    )
 
 
-def _source_row(source: dict) -> rx.Component:
-    return rx.table.row(
-        rx.table.cell(source["category"], white_space="nowrap", color="gray"),
-        rx.table.row_header_cell(_source_name_cell(source)),
-        rx.table.cell(source["strength"]),
-        _hover={"background": "var(--gray-a2)"},
-        style={"verticalAlign": "middle"},
+def _category_section(category: str, sources: list[dict]) -> rx.Component:
+    color = CATEGORY_COLORS[category]
+    return rx.vstack(
+        rx.box(
+            rx.text(category, size="3", weight="bold", color=f"var(--{color}-11)"),
+            border_left=f"4px solid var(--{color}-9)",
+            padding_left="0.6em",
+        ),
+        rx.box(
+            *[_source_card(source) for source in sources],
+            style={
+                "display": "grid",
+                "gridTemplateColumns": "repeat(auto-fit, minmax(260px, 1fr))",
+                "gap": "0.75em",
+            },
+            width="100%",
+        ),
+        align_items="start",
+        spacing="3",
+        width="100%",
     )
 
 
 def news() -> rx.Component:
     return rx.vstack(
         rx.heading("新聞", size="5"),
-        rx.text("綜合看盤平台，以及依市場分類的一手新聞來源與實戰建議。", size="2", color="gray"),
-        rx.box(
-            rx.table.root(
-                rx.table.header(
-                    rx.table.row(
-                        rx.table.column_header_cell("分類"),
-                        rx.table.column_header_cell("平台名稱"),
-                        rx.table.column_header_cell("核心優勢與定位"),
-                    )
-                ),
-                rx.table.body(*[_source_row(source) for source in NEWS_SOURCES]),
-                variant="surface",
-                width="100%",
-            ),
-            width="100%",
-            overflow_x="auto",
-        ),
+        rx.text("依市場分類的一手新聞來源，點擊卡片即可開啟官方網站。", size="2", color="gray"),
+        *[
+            _category_section(category, list(sources))
+            for category, sources in itertools.groupby(NEWS_SOURCES, key=lambda s: s["category"])
+        ],
         align_items="start",
-        spacing="3",
+        spacing="5",
         width="100%",
     )
