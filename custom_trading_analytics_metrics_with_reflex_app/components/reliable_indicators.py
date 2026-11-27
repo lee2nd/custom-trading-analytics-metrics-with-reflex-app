@@ -325,6 +325,7 @@ def reliable_indicators() -> rx.Component:
             background="var(--gray-a2)",
             margin_top="0.5em",
         ),
+        _economic_calendar_section(),
         align_items="start",
         spacing="4",
         width="100%",
