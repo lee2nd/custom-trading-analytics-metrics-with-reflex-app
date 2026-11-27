@@ -95,46 +95,55 @@ TONE_COLORS = {
 ECONOMIC_INDICATORS = [
     {
         "metric": "CPI / Core CPI",
+        "full_name": "Consumer Price Index / Core CPI（消費者物價指數／核心消費者物價指數）",
         "strong": [("可能利空風險資產", "down")],
         "weak": [("可能利多風險資產", "up")],
     },
     {
         "metric": "PCE",
+        "full_name": "Personal Consumption Expenditures Price Index（個人消費支出物價指數）",
         "strong": [("可能利空", "down")],
         "weak": [("可能利多", "up")],
     },
     {
         "metric": "NFP",
+        "full_name": "Non-Farm Payrolls（非農就業人數）",
         "strong": [("視通膨與利率環境", "neutral")],
         "weak": [("視衰退風險", "neutral")],
     },
     {
         "metric": "Unemployment",
+        "full_name": "Unemployment Rate（失業率）",
         "strong": [("可能利空降息預期", "down")],
         "weak": [("可能利多降息，", "up"), ("但也可能引發衰退擔憂", "neutral")],
     },
     {
         "metric": "Retail Sales",
+        "full_name": "Retail Sales（零售銷售）",
         "strong": [("經濟強，但利率可能較高", "neutral")],
         "weak": [("可能利多降息，", "up"), ("或利空經濟", "down")],
     },
     {
         "metric": "GDP",
+        "full_name": "Gross Domestic Product（國內生產毛額）",
         "strong": [("可能利好盈利，", "up"), ("利空降息預期", "down")],
         "weak": [("可能利多降息，", "up"), ("或利空成長", "down")],
     },
     {
         "metric": "ISM PMI",
+        "full_name": "ISM Purchasing Managers' Index（ISM 採購經理人指數）",
         "strong": [("視景氣及通膨分項", "neutral")],
         "weak": [("視衰退與利率預期", "neutral")],
     },
     {
         "metric": "JOLTS",
+        "full_name": "Job Openings and Labor Turnover Survey（職位空缺與勞動力流動調查）",
         "strong": [("勞動需求強，可能偏鷹", "neutral")],
         "weak": [("勞動需求弱，可能偏鴿", "neutral")],
     },
     {
         "metric": "FOMC",
+        "full_name": "Federal Open Market Committee（聯邦公開市場委員會）",
         "strong": [("偏鷹通常不利風險資產", "down")],
         "weak": [("偏鴿通常利多風險資產", "up")],
     },
@@ -220,7 +229,14 @@ def _tone_cell(segments: list[tuple[str, str]]) -> rx.Component:
 
 def _indicator_row(indicator: dict) -> rx.Component:
     return rx.table.row(
-        rx.table.row_header_cell(rx.text(indicator["metric"], size="2", weight="bold")),
+        rx.table.row_header_cell(
+            rx.vstack(
+                rx.text(indicator["metric"], size="2", weight="bold"),
+                rx.text(indicator["full_name"], size="1", color="gray"),
+                spacing="0",
+                align_items="start",
+            )
+        ),
         rx.table.cell(_tone_cell(indicator["strong"])),
         rx.table.cell(_tone_cell(indicator["weak"])),
         _hover={"background": "var(--gray-a2)"},
