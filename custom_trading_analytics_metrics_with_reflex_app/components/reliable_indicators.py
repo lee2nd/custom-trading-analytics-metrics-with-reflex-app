@@ -228,6 +228,74 @@ def _indicator_row(indicator: dict) -> rx.Component:
     )
 
 
+def _economic_calendar_section() -> rx.Component:
+    return rx.box(
+        rx.vstack(
+            rx.hstack(
+                rx.icon("calendar-clock", size=16, color="var(--accent-11)"),
+                rx.text("重大訊息公布", size="3", weight="bold"),
+                spacing="2",
+                align="center",
+            ),
+            rx.text(
+                "追蹤會牽動美元與風險資產走勢的高評級（紅色）經濟數據，"
+                "建議透過 ForexFactory 財經日曆篩選後每日追蹤。",
+                size="2",
+                color="gray",
+            ),
+            _source_card(FOREX_CALENDAR_SOURCE),
+            rx.vstack(
+                rx.text("Filter 設定", size="3", weight="bold"),
+                *[
+                    _filter_step(index, icon, text)
+                    for index, (icon, text) in enumerate(FILTER_STEPS, start=1)
+                ],
+                spacing="2",
+                align_items="start",
+                width="100%",
+            ),
+            rx.vstack(
+                rx.text("數據公布：偏強 / 偏弱影響對照", size="3", weight="bold"),
+                rx.box(
+                    rx.table.root(
+                        rx.table.header(
+                            rx.table.row(
+                                rx.table.column_header_cell("數據"),
+                                rx.table.column_header_cell("偏強 / 高於預期"),
+                                rx.table.column_header_cell("偏弱 / 低於預期"),
+                            )
+                        ),
+                        rx.table.body(*[_indicator_row(item) for item in ECONOMIC_INDICATORS]),
+                        variant="surface",
+                        width="100%",
+                    ),
+                    width="100%",
+                    overflow_x="auto",
+                ),
+                spacing="2",
+                align_items="start",
+                width="100%",
+            ),
+            rx.callout(
+                "以上對照僅為市場慣例參考，實際影響力需視當下總經環境、市場預期與資金部位而定，"
+                "並非保證走勢，請搭配其他指標綜合判斷。",
+                icon="info",
+                size="1",
+                color_scheme="gray",
+            ),
+            spacing="3",
+            align_items="start",
+            width="100%",
+        ),
+        width="100%",
+        padding="1.25em 1.5em",
+        border_radius="12px",
+        border="1px solid var(--gray-a5)",
+        background="var(--gray-a2)",
+        margin_top="1.5em",
+    )
+
+
 def reliable_indicators() -> rx.Component:
     return rx.vstack(
         rx.heading("可靠指標", size="5"),
