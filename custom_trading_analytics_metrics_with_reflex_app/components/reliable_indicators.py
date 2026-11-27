@@ -62,6 +62,50 @@ RANGES = [
     },
 ]
 
+# CoinGlass: single link card reusing the _source_card() layout.
+CONTRACT_INDICATOR_SOURCE = {
+    "name": "CoinGlass",
+    "url": "https://www.coinglass.com/",
+    "tag": "全市場合約數據",
+    "strength": "整合全市場未平倉量、資金費率、清算等合約數據，適合觀察槓桿部位與多空力道變化",
+}
+
+# 合約指標速覽：指標本身與其用來觀察的市場狀態。
+CONTRACT_METRICS = [
+    {"metric": "Global Open Interest", "purpose": "全市場槓桿部位是否增加"},
+    {"metric": "OI 24H Change", "purpose": "短期資金進出速度"},
+    {"metric": "Open Interest, OI", "purpose": "合約未平倉量"},
+    {"metric": "Funding Rate", "purpose": "多空哪一方正在付費"},
+    {"metric": "Liquidation", "purpose": "是否發生大規模槓桿清算"},
+]
+
+# 價格與 OI 同漲同跌的常見組合解讀。每格文字拆成 (文字, tone) 給
+# _tone_cell() 上色；tone 對應 TONE_COLORS。OI 欄位固定標記為 neutral，
+# 因為 OI 單獨上升或下降並不能判斷是多頭還是空頭（每張合約都同時有多方
+# 和空方），方向性的解讀留給「常見解讀」欄位。
+PRICE_OI_INTERPRETATIONS = [
+    {
+        "price": [("上漲", "up")],
+        "oi": [("上升", "neutral")],
+        "interpretation": [("新部位進場，可能是多頭增加", "up")],
+    },
+    {
+        "price": [("下跌", "down")],
+        "oi": [("上升", "neutral")],
+        "interpretation": [("新部位進場，可能是空頭增加", "down")],
+    },
+    {
+        "price": [("上漲", "up")],
+        "oi": [("下降", "neutral")],
+        "interpretation": [("空頭平倉或遭清算", "up")],
+    },
+    {
+        "price": [("下跌", "down")],
+        "oi": [("下降", "neutral")],
+        "interpretation": [("多頭平倉或遭清算", "down")],
+    },
+]
+
 # ForexFactory calendar: single link card reusing the _source_card() layout.
 FOREX_CALENDAR_SOURCE = {
     "name": "ForexFactory Calendar",
@@ -227,6 +271,25 @@ def _tone_cell(segments: list[tuple[str, str]]) -> rx.Component:
     )
 
 
+def _contract_metric_row(item: dict) -> rx.Component:
+    return rx.table.row(
+        rx.table.row_header_cell(rx.text(item["metric"], size="2", weight="bold")),
+        rx.table.cell(rx.text(item["purpose"], size="2", color="gray")),
+        _hover={"background": "var(--gray-a2)"},
+        style={"verticalAlign": "middle"},
+    )
+
+
+def _price_oi_row(item: dict) -> rx.Component:
+    return rx.table.row(
+        rx.table.row_header_cell(_tone_cell(item["price"])),
+        rx.table.cell(_tone_cell(item["oi"])),
+        rx.table.cell(_tone_cell(item["interpretation"])),
+        _hover={"background": "var(--gray-a2)"},
+        style={"verticalAlign": "middle"},
+    )
+
+
 def _indicator_row(indicator: dict) -> rx.Component:
     return rx.table.row(
         rx.table.row_header_cell(
@@ -241,6 +304,84 @@ def _indicator_row(indicator: dict) -> rx.Component:
         rx.table.cell(_tone_cell(indicator["weak"])),
         _hover={"background": "var(--gray-a2)"},
         style={"verticalAlign": "middle"},
+    )
+
+
+def _contracts_section() -> rx.Component:
+    return rx.box(
+        rx.vstack(
+            rx.hstack(
+                rx.icon("layers", size=16, color="var(--accent-11)"),
+                rx.text("加密貨幣全市場合約指標", size="3", weight="bold"),
+                spacing="2",
+                align="center",
+            ),
+            rx.text(
+                "透過 CoinGlass 整理的全市場合約數據，觀察槓桿部位增減、資金費率方向，"
+                "以及是否出現大規模清算。",
+                size="2",
+                color="gray",
+            ),
+            _source_card(CONTRACT_INDICATOR_SOURCE),
+            rx.vstack(
+                rx.text("合約指標速覽", size="3", weight="bold"),
+                rx.box(
+                    rx.table.root(
+                        rx.table.header(
+                            rx.table.row(
+                                rx.table.column_header_cell("指標"),
+                                rx.table.column_header_cell("觀察目的"),
+                            )
+                        ),
+                        rx.table.body(*[_contract_metric_row(item) for item in CONTRACT_METRICS]),
+                        variant="surface",
+                        width="100%",
+                    ),
+                    width="100%",
+                    overflow_x="auto",
+                ),
+                spacing="2",
+                align_items="start",
+                width="100%",
+            ),
+            rx.vstack(
+                rx.text("價格與 OI 對照：常見解讀", size="3", weight="bold"),
+                rx.box(
+                    rx.table.root(
+                        rx.table.header(
+                            rx.table.row(
+                                rx.table.column_header_cell("價格"),
+                                rx.table.column_header_cell("OI"),
+                                rx.table.column_header_cell("常見解讀"),
+                            )
+                        ),
+                        rx.table.body(*[_price_oi_row(item) for item in PRICE_OI_INTERPRETATIONS]),
+                        variant="surface",
+                        width="100%",
+                    ),
+                    width="100%",
+                    overflow_x="auto",
+                ),
+                spacing="2",
+                align_items="start",
+                width="100%",
+            ),
+            rx.callout(
+                "注意：OI 上升不代表一定是多頭，因為每張合約同時有多方和空方。",
+                icon="info",
+                size="1",
+                color_scheme="gray",
+            ),
+            spacing="3",
+            align_items="start",
+            width="100%",
+        ),
+        width="100%",
+        padding="1.25em 1.5em",
+        border_radius="12px",
+        border="1px solid var(--gray-a5)",
+        background="var(--gray-a2)",
+        margin_top="1.5em",
     )
 
 
@@ -341,6 +482,7 @@ def reliable_indicators() -> rx.Component:
             background="var(--gray-a2)",
             margin_top="0.5em",
         ),
+        _contracts_section(),
         _economic_calendar_section(),
         align_items="start",
         spacing="4",
