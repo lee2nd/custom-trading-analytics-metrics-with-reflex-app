@@ -62,6 +62,84 @@ RANGES = [
     },
 ]
 
+# ForexFactory calendar: single link card reusing the _source_card() layout.
+FOREX_CALENDAR_SOURCE = {
+    "name": "ForexFactory Calendar",
+    "url": "https://www.forexfactory.com/calendar",
+    "tag": "即時財經日曆",
+    "strength": "篩選高評級（紅色）美元事件，掌握 CPI、NFP、FOMC 等牽動市場的公布時間點。",
+}
+
+# Filter 設定步驟，依序對應 ForexFactory 日曆上方 Filter 選單的操作順序。
+FILTER_STEPS = [
+    ("sliders-horizontal", "點選日曆上方的 Filter。"),
+    ("flame", "Impact：只勾選 High（紅色）。"),
+    ("dollar-sign", "Currency：優先勾選 USD。"),
+    ("clock", "時區設定為你的當地時間，台灣是 GMT+8。"),
+    ("list-checks", "每天先看 Today，再看 Tomorrow 以及本週剩餘事件。"),
+]
+
+# Radix color token per sentiment tone, used to color individual table-cell
+# text segments (not the whole cell, since one cell can mix tones).
+TONE_COLORS = {
+    "up": "var(--green-11)",
+    "down": "var(--red-11)",
+    "neutral": "gray",
+}
+
+# 經濟數據公布結果對「偏強/高於預期」「偏弱/低於預期」的常見市場解讀。
+# 每格文字拆成 (文字片段, tone) 列表；tone 對應 TONE_COLORS。同一格若同時
+# 出現利多與利空語意（例如 GDP、Retail Sales 偏弱欄），拆成多個片段分別
+# 上色，而非整格只選一種顏色。沒有明確「利多/利好/利空/不利」字眼的描述
+# （例如「視通膨與利率環境」「可能偏鷹/偏鴿」）一律標記為 neutral。
+ECONOMIC_INDICATORS = [
+    {
+        "metric": "CPI / Core CPI",
+        "strong": [("可能利空風險資產", "down")],
+        "weak": [("可能利多風險資產", "up")],
+    },
+    {
+        "metric": "PCE",
+        "strong": [("可能利空", "down")],
+        "weak": [("可能利多", "up")],
+    },
+    {
+        "metric": "NFP",
+        "strong": [("視通膨與利率環境", "neutral")],
+        "weak": [("視衰退風險", "neutral")],
+    },
+    {
+        "metric": "Unemployment",
+        "strong": [("可能利空降息預期", "down")],
+        "weak": [("可能利多降息，", "up"), ("但也可能引發衰退擔憂", "neutral")],
+    },
+    {
+        "metric": "Retail Sales",
+        "strong": [("經濟強，但利率可能較高", "neutral")],
+        "weak": [("可能利多降息，", "up"), ("或利空經濟", "down")],
+    },
+    {
+        "metric": "GDP",
+        "strong": [("可能利好盈利，", "up"), ("利空降息預期", "down")],
+        "weak": [("可能利多降息，", "up"), ("或利空成長", "down")],
+    },
+    {
+        "metric": "ISM PMI",
+        "strong": [("視景氣及通膨分項", "neutral")],
+        "weak": [("視衰退與利率預期", "neutral")],
+    },
+    {
+        "metric": "JOLTS",
+        "strong": [("勞動需求強，可能偏鷹", "neutral")],
+        "weak": [("勞動需求弱，可能偏鴿", "neutral")],
+    },
+    {
+        "metric": "FOMC",
+        "strong": [("偏鷹通常不利風險資產", "down")],
+        "weak": [("偏鴿通常利多風險資產", "up")],
+    },
+]
+
 
 def _source_card(source: dict) -> rx.Component:
     return rx.link(
