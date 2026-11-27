@@ -201,6 +201,33 @@ def _range_row(band: dict) -> rx.Component:
     )
 
 
+def _filter_step(index: int, icon: str, text: str) -> rx.Component:
+    return rx.hstack(
+        rx.badge(str(index), color_scheme="gray", variant="soft", radius="full"),
+        rx.icon(icon, size=16, color="var(--accent-9)", flex_shrink="0"),
+        rx.text(text, size="2", color="gray"),
+        spacing="2",
+        align="center",
+    )
+
+
+def _tone_cell(segments: list[tuple[str, str]]) -> rx.Component:
+    return rx.text(
+        *[rx.text.span(text, color=TONE_COLORS[tone]) for text, tone in segments],
+        size="2",
+    )
+
+
+def _indicator_row(indicator: dict) -> rx.Component:
+    return rx.table.row(
+        rx.table.row_header_cell(rx.text(indicator["metric"], size="2", weight="bold")),
+        rx.table.cell(_tone_cell(indicator["strong"])),
+        rx.table.cell(_tone_cell(indicator["weak"])),
+        _hover={"background": "var(--gray-a2)"},
+        style={"verticalAlign": "middle"},
+    )
+
+
 def reliable_indicators() -> rx.Component:
     return rx.vstack(
         rx.heading("可靠指標", size="5"),
